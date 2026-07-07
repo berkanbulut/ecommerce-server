@@ -1,48 +1,51 @@
 server:
-    port: ${PORT:8080}
+  port: ${PORT:8080}
 
 app:
-    upload:
-        base-path: uploads
-        product-path: products
-    security:
-        jwt:
-            issuer: spring_security_full_implementation
-            access-minutes: 15
-            refresh-days: 14
-            secret: ${JWT_SECRET}
+  upload:
+    base-path: uploads
+    product-path: products
+  security:
+    jwt:
+      issuer: spring_security_full_implementation
+      access-minutes: 15
+      refresh-days: 14
+      secret: ${JWT_SECRET}
 spring:
-    application:
-        name: ecommerce
-    servlet:
-        multipart:
-            max-file-size: 10MB
-            max-request-size: 10MB
-    datasource:
-        url: ${DB_URL}
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
-    jpa:
-        hibernate:
-            ddl-auto: update
-        show-sql: false
-        properties:
-            hibernate:
-                format_sql: true
-    mail:
-        host: localhost
-        port: 1025
-        username:
-        password:
-        properties:
-            mail:
-                smtp:
-                    auth: false
-                    starttls:
-                        enable: false
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: ecommerce
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
 
 stripe:
   secret-key: ${STRIPE_SECRET_KEY}
   webhook-secret: ${STRIPE_WEBHOOK_SECRET}
   success-url: ${STRIPE_SUCCESS_URL}
   cancel-url: ${STRIPE_CANCEL_URL}
+
