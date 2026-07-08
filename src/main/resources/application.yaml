@@ -5,6 +5,9 @@ app:
   upload:
     base-path: uploads
     product-path: products
+  cookie:
+    secure: ${COOKIE_SECURE:false}
+    same-site: ${COOKIE_SAME_SITE:Strict}
   security:
     jwt:
       issuer: spring_security_full_implementation

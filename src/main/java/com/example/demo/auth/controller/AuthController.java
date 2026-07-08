@@ -6,6 +6,7 @@ import com.example.demo.auth.entity.RefreshToken;
 import com.example.demo.auth.service.PasswordResetService;
 import com.example.demo.auth.service.RefreshTokenService;
 import com.example.demo.auth.service.impl.AuthServiceImpl;
+import com.example.demo.config.CookieProperties;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.security.CustomUserDetailsService;
@@ -32,6 +33,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final PasswordResetService passwordResetService;
+    private final CookieProperties cookieProperties;
 
     public AuthController(
             AuthServiceImpl authService,
@@ -39,7 +41,8 @@ public class AuthController {
             CustomUserDetailsService customUserDetailsService,
             JwtService jwtService,
             UserRepository userRepository,
-            PasswordResetService passwordResetService
+            PasswordResetService passwordResetService,
+            CookieProperties cookieProperties
     ) {
         this.authService = authService;
         this.refreshTokenService = refreshTokenService;
@@ -47,6 +50,7 @@ public class AuthController {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
         this.passwordResetService = passwordResetService;
+        this.cookieProperties = cookieProperties;
     }
 
     @PostMapping("/register")
@@ -73,10 +77,10 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", result.refreshToken())
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieProperties.isSecure())
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60)
-                .sameSite("Strict")
+                .sameSite(cookieProperties.getSameSite())
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -111,10 +115,10 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", newToken.getToken())
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieProperties.isSecure())
                 .path("/api/v1/auth")
                 .maxAge(7 * 24 * 60 * 60)
-                .sameSite("Strict")
+                .sameSite(cookieProperties.getSameSite())
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -142,7 +146,7 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieProperties.isSecure())
                 .path("/api/v1/auth")
                 .maxAge(0)
                 .build();
