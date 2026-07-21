@@ -8,6 +8,7 @@ import com.example.demo.permission.entity.Permission;
 import com.example.demo.permission.repository.PermissionRepository;
 import com.example.demo.product.entity.Product;
 import com.example.demo.product.repository.ProductRepository;
+import com.example.demo.product.service.PexelsImageService;
 import com.example.demo.role.entity.Role;
 import com.example.demo.role.repository.RoleRepository;
 import com.example.demo.user.entity.User;
@@ -26,6 +27,11 @@ import java.util.Random;
 public class DataSeeder {
 
     private final Random random = new Random();
+    private final PexelsImageService pexelsImageService;
+
+    public DataSeeder( PexelsImageService pexelsImageService){
+      this.pexelsImageService = pexelsImageService;
+    }
 
     @Bean
     CommandLineRunner seed(
@@ -293,10 +299,15 @@ public class DataSeeder {
                     BigDecimal salePrice =
                             BigDecimal.valueOf(price.doubleValue() - random.nextInt(30));
 
-                    String image =
-                            "https://picsum.photos/seed/product"
-                                    + (i + 1)
-                                    + "/600/600";
+                    List<String> imageUrls =
+                            pexelsImageService.searchImageUrls(
+                                    productName + " product",
+                                    3
+                            );
+
+                    String mainImageUrl = imageUrls.isEmpty()
+                            ? "https://placehold.co/600x600?text=No+Image"
+                            : imageUrls.get(0);
 
                     Product product = new Product(
                             productName,
@@ -310,31 +321,17 @@ public class DataSeeder {
                             stock,
                             true,
                             random.nextBoolean(),
-                            image,
+                            mainImageUrl,
                             category,
                             brand
                     );
 
-                    product.addImage(
-                            "https://picsum.photos/seed/product-gallery-"
-                                    + (i + 1)
-                                    + "-1/800/800",
-                            1
-                    );
-
-                    product.addImage(
-                            "https://picsum.photos/seed/product-gallery-"
-                                    + (i + 1)
-                                    + "-2/800/800",
-                            2
-                    );
-
-                    product.addImage(
-                            "https://picsum.photos/seed/product-gallery-"
-                                    + (i + 1)
-                                    + "-3/800/800",
-                            3
-                    );
+                    for (int imageIndex = 1; imageIndex < imageUrls.size(); imageIndex++) {
+                        product.addImage(
+                                imageUrls.get(imageIndex),
+                                imageIndex
+                        );
+                    }
 
                     productRepository.save(product);
                 }
@@ -382,4 +379,5 @@ public class DataSeeder {
                 .replace("&", "")
                 .replace("--", "-");
     }
+
 }

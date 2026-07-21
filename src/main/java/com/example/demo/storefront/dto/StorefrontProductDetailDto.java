@@ -15,6 +15,7 @@ public record StorefrontProductDetailDto(
         String mainImageUrl,
         List<StorefrontProductImageDto> images,
         String stockStatus,
+        Integer stockQuantity,
         Double ratingAverage,
         Integer ratingCount,
         StorefrontCategoryDto category,

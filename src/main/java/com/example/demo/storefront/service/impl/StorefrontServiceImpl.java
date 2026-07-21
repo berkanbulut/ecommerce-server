@@ -253,6 +253,7 @@ public class StorefrontServiceImpl implements StorefrontService {
                         )
                         .toList(),
                 product.getStockStatus().name(),
+                product.getStockQuantity(),
                 product.getRatingAverage(),
                 product.getRatingCount(),
                 toCategoryDto(product.getCategory()),
