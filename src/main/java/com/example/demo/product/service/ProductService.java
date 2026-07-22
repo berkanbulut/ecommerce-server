@@ -14,4 +14,5 @@ public interface ProductService {
     ProductResponseDto updateProduct(Long id, UpdateProductDto updateProductDto);
     ProductResponseDto patchProduct(Long id, PatchProductDto patchProductDto);
     void deleteProduct(Long id);
+    void regenerateAllProductImages();
 }

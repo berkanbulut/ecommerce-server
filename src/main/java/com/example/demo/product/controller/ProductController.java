@@ -75,4 +75,14 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.ok(ApiResponse.success("Product deleted successfully"));
     }
+
+    @PreAuthorize("hasAuthority('product:update')")
+    @PostMapping("/regenerate-images")
+    public ResponseEntity<ApiResponse<Void>> regenerateProductImages() {
+        productService.regenerateAllProductImages();
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Product images regenerated successfully")
+        );
+    }
 }

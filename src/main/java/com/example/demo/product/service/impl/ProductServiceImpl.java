@@ -14,6 +14,7 @@ import com.example.demo.product.entity.Product;
 import com.example.demo.product.mapper.ProductMapper;
 import com.example.demo.product.repository.ProductRepository;
 import com.example.demo.product.service.ImageCleanupService;
+import com.example.demo.product.service.PexelsImageService;
 import com.example.demo.product.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,19 +31,25 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final ImageCleanupService imageCleanupService;
+    private final PexelsImageService pexelsImageService;
+
 
     public ProductServiceImpl(
             CategoryRepository categoryRepository,
             BrandRepository brandRepository,
             ProductRepository productRepository,
             ProductMapper productMapper,
-            ImageCleanupService imageCleanupService
+            ImageCleanupService imageCleanupService,
+            PexelsImageService pexelsImageService
+
     ) {
         this.categoryRepository = categoryRepository;
         this.brandRepository = brandRepository;
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.imageCleanupService = imageCleanupService;
+        this.pexelsImageService = pexelsImageService;
+
     }
 
     @Override
@@ -266,5 +273,29 @@ public class ProductServiceImpl implements ProductService {
         } while (productRepository.existsBySku(sku));
 
         return sku;
+    }
+
+
+    @Override
+    @Transactional
+    public void regenerateAllProductImages() {
+        List<Product> products = productRepository.findAll();
+
+        for (Product product : products) {
+            List<String> imageUrls =
+                    pexelsImageService.searchImageUrls(product.getName(), 4);
+
+            if (imageUrls.isEmpty()) {
+                continue;
+            }
+
+            product.patchMainImage(imageUrls.get(0));
+
+            product.replaceImages(List.of());
+
+            for (int i = 1; i < imageUrls.size(); i++) {
+                product.addImage(imageUrls.get(i), i);
+            }
+        }
     }
 }
